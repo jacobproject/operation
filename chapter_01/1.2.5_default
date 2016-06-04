@@ -62,7 +62,7 @@ label linux
   menu label ^Install CentOS 7
   menu default
   kernel vmlinuz
-  append initrd=initrd.img inst.ks=ftp://172.16.0.254 quiet
+  append initrd=initrd.img inst.ks=ftp://172.16.0.254/ks.cfg quiet
 
 label check
   menu label Test this ^media & install CentOS 7
