@@ -1,0 +1,37 @@
+#!/bin/bash
+while true                             #无限循环while
+do
+clear
+echo "---------------------------------"
+echo "1. Display CPU info:"
+echo "2. Display system load:"
+echo "3. Display Mem and swap info:"
+echo "4. Display filesystem mount info:"
+echo "5. Exit Program:"
+echo "---------------------------------"
+read -p "Please select an iterm(1-5):" U_SELECT
+case $U_SELECT in
+    1)
+echo $(cat /proc/cpuinfo)
+read -p "Press Enter to continue:"
+;;
+    2)
+echo $(uptime)
+read -p "Press Enter to continue:"
+;;
+    3)
+echo $(free)
+read -p "Press Enter to continue:"
+;;
+    4)
+echo "$(df -h)"
+read -p "Press Enter to continue:"
+;;
+5)
+exit
+;;
+
+    *)
+read -p "Please Select 1-5, Press Enter to continue:"
+esac
+done
