@@ -1,0 +1,71 @@
+#!/bin/bash
+
+#Startup script for proftpd
+#chkconfig: - 89 77
+#Description:Proftpd is a secure and configurable FTP Server.
+#Program:/usr/local/proftpd/sbin/proftpd
+#Configure file:/etc/proftpd.conf
+
+#Synopsis:
+#	proftpd --help {start|stop|restart|status}
+
+#Define variable
+Proftpd=/usr/local/proftpd/sbin/proftpd
+Pidfile=/usr/local/proftpd/var/proftpd.pid
+Program=$(basename $0)
+Hint_color="echo -en \\033[1;32m"
+Orig_color="echo -e \\033[0m"
+Tab="\t\t\t\t\t\t\t"
+#Functions
+
+usage(){
+echo "Usage:$Program [--help] {start|stop|restart|status}"
+}
+
+start(){
+if [ -e $Pidfile ];then
+echo "Proftpd alread running..."
+else
+echo -en "Starting Proftpd:${Tab}[ "
+/usr/local/proftpd/sbin/proftpd
+${Hint_color}OK;${Orig_color}" ]"
+fi
+}
+stop(){
+if [ -e $Pidfile ];then
+echo -en "Stopping Proftpd:${Tab}[ "
+kill -TERM $(cat ${Pidfile})
+${Hint_color}OK;${Orig_color}" ]"
+else
+echo "Proftpd already stopped."
+fi
+}
+status(){
+if [ -e $Pidfile ];then
+echo "Proftpd ($(cat $Pidfile)) is running..."
+else
+echo "Proftpd is stopped."
+fi
+}
+if [ $# -gt 0 ];then
+case $1 in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	restart)
+		stop
+		sleep 0.2
+		start
+		;;
+	status)
+		status
+		;;
+	--help|*)
+		usage
+esac
+else
+usage
+fi
