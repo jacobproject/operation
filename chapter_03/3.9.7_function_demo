@@ -1,0 +1,70 @@
+#!/bin/bash
+#Simple function demo.
+HINT(){                                           #打印提示符
+read -p "Press Enter tocontinue:"
+}
+CPU_INFO(){                                       #查看CPU信息
+echo
+echo -e "\033[4;31mPrint the CPU info:\033[0m"
+cat /proc/cpuinfo |awk 'BEGIN {FS=":"} /model name/{print "CPU Model:" $2}'
+cat /proc/cpuinfo |awk 'BEGIN {FS=":"} /cpu MHz/{print "CPU Speed:" $2"MHz"}'
+grep -Eq 'svm|vmx' /proc/cpuinfo && echo "Virtualization: Support" || \
+echo "Virtualization: No support"
+echo
+}
+LOAD_INFO(){                                      #查看系统负载
+echo
+echo -e "\033[4;31mPrint the system load:\033[0m"
+uptime |awk 'BEGIN{FS=":"}{print $5}'|awk 'BEGIN{FS=","}\      #\为转义换行
+{print "Last 1 minutes system load:"$1"\n""Last 5 minutes system load:"$2"\n"\
+"Last 15 minutes system load:"$3}'
+echo
+}
+MEM_INFO(){                                       #查看内存与交换分区信息
+echo
+echo -e "\033[4;31mPrint the Memory and Swap info:\033[0m"
+free |grep buffers/cache|awk '{print "Mem free:"$4" Bytes"}'
+free |grep Swap|awk '{print "Swap free:"$4" Bytes"}'
+echo
+}
+DISK_INFO(){                                       #查看磁盘挂载信息
+echo
+echo -e "\033[4;31mPrint system disk space usage:\033[0m"
+df -h
+echo
+}
+while true
+do
+clear
+echo "---------------------------------"
+echo "1. Display CPU info:"
+echo "2. Display system load:"
+echo "3. Display Mem and swap info:"
+echo "4. Display filesystem mount info:"
+echo "5. Exit Script:"
+echo "---------------------------------"
+read -p "Please select an iterm(1-4):" U_SELECT
+case $U_SELECT in
+    1)
+CPU_INFO                                  #通过函数名称调用函数
+HINT
+;;
+    2)
+LOAD_INFO
+HINT
+;;
+    3)
+MEM_INFO
+HINT
+;;
+    4)
+DISK_INFO
+HINT
+;;
+    5)
+exit
+;;
+    *)
+read -p "Please Select 1-4, Press Enter to continue:"
+esac
+done
