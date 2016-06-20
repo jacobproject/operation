@@ -1,0 +1,62 @@
+#!/bin/bash
+#Auto deploy DHCP Server for 192.168.0.0/24 network
+#This script need you have yum repository.
+#Author: Jacob
+#变量定义，主要包括网络、子网、地址池等信息
+NET=192.168.0.0
+MASK=255.255.255.0
+RANGE="192.168.0.10 192.168.0.50"
+DNS=202.106.0.20
+DOMAIN_NAME="example.com"
+ROUTER=192.168.0.254
+#函数定义，测试yum源
+test_yum(){
+yum list dhcp >/dev/null 2&>1
+if [ $? -ne 0 ] ; then
+	echo
+	echo "There was an error to connect to Yum repository."
+	echo "Please verify your yum repository settings and try again."
+	echo
+	exit
+fi
+}
+#保存原有的配置文件
+test_conf(){
+if [ -f /etc/dhcp/dhcpd.conf ];then
+	mv /etc/dhcp/dhcpd.conf /etc/dhcp/dhcp.conf.save
+fi
+}
+#创建新的配置文件
+create_conf(){
+cat > /etc/dhcp/dhcpd.conf <<EOF	
+# dhcpd.conf
+# Sample configuration file for ISC dhcpd
+#
+# option definitions common to all supported networks...
+default-lease-time 600;
+max-lease-time 7200;
+# This is a very basic subnet declaration.
+# A slightly different configuration for an internal subnet.
+subnet $NET netmask $MASK {
+  range $RANGE;
+  option domain-name-servers $DNS;
+  option domain-name "$DOMAIN_NAME";
+  option routers $ROUTER;
+}
+# Fixed IP addresses can also be specified for hosts.
+host passacaglia {
+  hardware ethernet 0:0:c0:5d:bd:95;
+  fixed-address 192.168.0.1;
+}
+EOF
+}
+#通过函数名称调用函数功能，实现安装与配置DHCP服务
+rpm -q dhcp >/dev/null 2&>1 
+if [ $? -ne 0 ] ; then
+test_yum
+yum -y install dhcp >/dev/null 2&>1
+fi
+test_conf
+create_conf
+systemctl start dhcpd                                   #启动服务
+systemctl enable dhcpd                                  #开机启动
