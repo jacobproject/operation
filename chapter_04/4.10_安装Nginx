@@ -1,0 +1,18 @@
+[root@centos7 ~]# wget http://nginx.org/download/nginx-1.8.1.tar.gz
+[root@centos7 ~]# tar –xzf nginx-1.8.1.tar.gz –C /usr/src/
+[root@centos7 ~]# yum –y install gcc pcre pcre-devel openssl \
+>openssl-devel zlib-devel gd gd-devel perl perl-ExtUtils-Embed
+[root@centos7 ~]# cd /usr/src/ nginx-1.8.1/
+[root@centos7 nginx-1.8.1]# ./configure --prefix=/usr/local/nginx \
+>--with-ipv6 \
+>--with-http_ssl_module \
+>--with-http_realip_module \
+>--with-http_addition_module \
+>--with-http_dav_module \ 
+>--with-http_flv_module \ 
+>--with-http_mp4_module \ 
+>--with-http_gzip_static_module \ 
+>--with-http_perl_module \ 
+>--with-mail \ 
+>--with-mail_ssl_module
+[root@centos7 nginx-1.8.1]# make && make install
