@@ -1,0 +1,17 @@
+$TTL 1D
+@	IN SOA	dns1.abc.com. jacob.abc.com. (
+				10	; serial
+				1D	; refresh
+				1H	; retry
+				1W	; expire
+				3H )	; minimum
+    NS	dns1.abc.com.
+    NS	dns2.abc.com.
+254.0	IN PTR	dns1.abc.com.
+253.0	IN PTR	dns2.abc.com.
+22.0  	IN PTR	ntp.abc.com.
+25.0	    IN PTR	mail.abc.com.
+100.0	IN PTR	fileserver.abc.com.
+101.0	IN PTR	printserver.abc.com.
+200.0	IN PTR	www.abc.com.
+201.0	IN PTR	www.abc.com.
