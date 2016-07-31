@@ -1,0 +1,19 @@
+[root@centos7 ~]# wget http://mirror.bit.edu.cn/apache/httpd/httpd-2.4.20.tar.gz
+[root@centos7 ~]# wget http://mirror.bjtu.edu.cn/apache/apr/apr-1.5.2.tar.gz
+[root@centos7 ~]# wget http://mirror.bjtu.edu.cn/apache/apr/apr-util-1.5.4.tar.gz
+[root@centos7 ~]# yum -y install gcc autoconf automake make \
+> pcre pcre-devel openssl openssl-devel
+[root@centos7 ~]# tar -xzf httpd-2.4.20.tar.gz -C /usr/src/
+[root@centos7 ~]# tar -xzf apr-1.5.2.tar.gz -C /usr/src/
+[root@centos7 ~]# tar -xzf apr-util-1.5.4.tar.gz -C /usr/src/
+[root@centos7 ~]# cd /usr/src/ apr-1.5.2/
+[root@centos7 apr-1.4.6]# ./configure
+[root@centos7 apr-1.4.6]# make && make install
+[root@centos7 apr-1.4.6]# cd /usr/src/apr-util-1.5.4/
+[root@centos7 apr-util-1.5.2]# ./configure  --with-apr=/usr/local/apr/
+[root@centos7 apr-util-1.5.2]# make && make install 
+[root@centos7 apr-util-1.5.2]# cd /usr/src/httpd-2.4.20/
+[root@centos7 httpd-2.4.4]# ./configure --prefix=/usr/local/apache2 --enable-so \
+> --enable-ssl  --enable-rewrite --with-mpm=worker --with-suexec-bin \
+> --with-apr=/usr/local/apr/
+[root@centos7 httpd-2.4.4]# make && make install
