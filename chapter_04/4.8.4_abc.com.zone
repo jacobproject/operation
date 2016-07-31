@@ -1,0 +1,18 @@
+$TTL 1D
+@	IN SOA	dns1.abc.com. jacob.abc.com. (
+				10	; serial
+				1D	; refresh
+				1H	; retry
+				1W	; expire
+				3H )	; minimum
+NS	dns1.abc.com.
+NS	dns2.abc.com.
+MX 10	mail.abc.com.
+dns1　　    IN A　172.16.0.254
+dns2　　    IN A　172.16.0.253
+ntp.abc.com．IN A　172.16.0.22
+mail.abc.com．IN A　172.16.0.25
+fileserver　    IN A　172.16.0.100
+printserver　IN A　172.16.0.101
+www　　IN A　172.16.0.200
+　    IN A　172.16.0.201
