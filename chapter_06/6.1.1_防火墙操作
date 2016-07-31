@@ -1,0 +1,22 @@
+查看filter表的所有规则：
+[root@centos7 ~]# iptables -nL 
+查看nat表的所有规则：
+[root@centos7 ~]# iptables -t nat -nL
+清空filter表中的所有规则：
+[root@centos7 ~]# iptables -F
+往filter表添加一条新的入站规则，丢弃192.168.0.1主机发送给防火墙本机的所有数据包。
+[root@centos7 ~]# iptables -A INPUT -s 192.168.0.1 -j DROP
+往filter表插入一条新的入站规则，拒绝192.168.0.22 ping防火墙本机：
+[root@centos7 ~]# iptables -I INPUT -s 192.168.0.22 -p icmp -j REJECT
+查看filter表中防火墙规则并显示规则编号：
+[root@centos7 ~]# iptables -nL --line-number
+删除filter表中INPUT链的第一条规则：
+[root@centos7 ~]# iptables -D INPUT 1
+替换filter表中INPUT链的第二条规则，拒绝192.168.0.254之外的任何主机连接防火墙本机：
+[root@centos7 ~]# iptables -R INPUT 2 ! -s 192.168.0.254 -j REJECT
+修改filter表中INPUT链的默认规则为接收数据包：
+[root@centos7 ~]# iptables -t filter -P INPUT ACCEPT
+将192.168.0.10主机发送给防火墙本机22端口的所有数据包信息记录到messages日志：
+[root@centos7 ~]# iptables -I INPUT -s 192.168.0.10 -p tcp --dport 22 -j LOG
+允许任何主机从eno16777736网络接口访问防火墙本机的80端口：
+[root@centos7 ~]# iptables -I INPUT -i eno16777736 --p tcp --dport 80 -j ACCEPT
