@@ -1,0 +1,41 @@
+[root@centos7 ~]# yum -y install targetcli
+[root@centos7 ~]# fdisk -l |grep /dev/sd
+Disk /dev/sda: 128.8 GB, 128849018880 bytes
+/dev/sda1   *        2048     1026047      512000   83  Linux
+/dev/sda2         1026048   251658239   125316096   8e  Linux LVM
+Disk /dev/sdb: 107.4 GB, 107374182400 bytes
+Disk /dev/sdc: 107.4 GB, 107374182400 bytes
+/dev/sdc1            2048    41945087    20971520   83  Linux
+/dev/sdc2        41945088    83888127    20971520   83  Linux
+/dev/sdc3        83888128   125831167    20971520   83  Linux
+Disk /dev/sdd: 107.4 GB, 107374182400 bytes
+[root@centos7 ~]# targetcli			#下面方框中粗体字需要自己输入
+
+Warning: Could not load preferences file /root/.targetcli/prefs.bin.
+targetcli shell version 2.1.fb41
+Copyright 2011-2013 by Datera, Inc and others.
+For help on commands, type 'help'.
+/> ls		#查看配置
+o- /................................................[...]
+  o-backstores.....................................[...]
+  |o- block .......................................[Storage Objects: 0]
+  |o- fileio......................................[Storage Objects: 0]
+  |o- pscsi ......................................[Storage Objects: 0]
+  |o- ramdisk.....................................[Storage Objects: 0]
+  o-iscsi ........................................[Targets: 0]
+  o-loopback......................................[Targets: 0]
+/> backstores/block create iscsi_store /dev/sdb
+#定义后端存储，这里我们准备用/dev/sdb做共享存储
+/> /iscsi create iqn.2016-06.com.example:server
+#定义共享名称（IQN）为：iqn.2016-06.com.example:server
+/> /iscsi/iqn.2016-06.com.example:server/tpg1/acls create iqn.2016-06com.example:desktop
+#设置访问控制权限，客户端配置文件需要配置iqn.2016-06.com.example:desktop，才可以访问iqn.2016-06com.example:server这个共享磁盘
+/> iscsi/iqn.2016-06.com.example:server/tpg1/luns create /backstores/block/iscsi_store
+#将IQN共享名称和前面定义的后端存储绑定在一起，客户端访问IQN将获取该存储空间
+/> iscsi/iqn.2016-06.com.example:server/tpg1/portals create 0.0.0.0
+#配置服务器监听的IP地址和端口，0.0.0.0为本机所有IP，默认端口为3260.
+/> exit               #退出配置程序，该程序会自动保存所有操作
+
+[root@centos7 ~]# systemctl start target		#启动服务
+[root@centos7 ~]# systemctl enable target		#设置开机启动
+[root@centos7 ~]# firewall-cmd --permanent --add-port=3260/tcp	 	[root@centos7 ~]# firewall-cmd --reload
