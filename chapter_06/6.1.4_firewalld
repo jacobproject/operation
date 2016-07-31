@@ -1,0 +1,67 @@
+查看默认zone，结果为trusted：
+[root@centos7 ~]# firewall-cmd --get-default-zone
+public
+设置默认zone为trusted：
+[root@centos7 ~]# firewall-cmd --set-default-zone=trusted
+success
+显示当前正在使用的zone信息：
+[root@centos7 ~]# firewall-cmd --get-active-zones 
+trusted
+  interfaces: eno16777736 eno33554984
+显示系统预定义的zone，默认为九个zone：
+[root@centos7 ~]# firewall-cmd --get-zones 
+block dmz drop external home internal public trusted work
+显示系统预定义的服务名称：
+[root@centos7 ~]# firewall-cmd --get-services 
+RH-Satellite-6 amanda-client bacula bacula-client dhcp dhcpv6 dhcpv6-client dns freeipa-ldap freeipa-ldaps freeipa-replication ftp high-availability http https imaps ipp ipp-client ipsec iscsi-target kerberos kpasswd ldap ldaps libvirt libvirt-tls mdns mountd ms-wbt mysql nfs ntp openvpn pmcd pmproxy pmwebapi pmwebapis pop3s postgresql proxy-dhcp radius rpc-bind rsyncd samba samba-client smtp ssh telnet tftp tftp-client transmission-client vdsm vnc-server wbem-https
+查询eno16777736接口与哪个zone匹配，网卡与trusted匹配，则该网卡的流量执行eno16777736中定义的规则，默认将允许访问所有服务：
+[root@centos7 ~]# firewall-cmd --get-zone-of-interface=eno16777736
+Trusted
+显示所有zone及其对应的规则信息：
+[root@centos7 ~]# firewall-cmd --list-all-zones
+block
+  interfaces: 
+  sources: 
+  services: 
+  ports: 
+  masquerade: no
+  forward-ports: 
+  icmp-blocks: 
+  rich rules: 
+	
+dmz
+  interfaces: 
+  sources: 
+  services: ssh
+  ports: 
+  masquerade: no
+部分内容省略… …
+在public这个zone中添加允许访问FTP服务的规则：
+[root@centos7 ~]# firewall-cmd --add-service=ftp --zone=public 
+Success
+从public这个zone中删除允许访问FTP服务的规则：
+[root@centos7 ~]# firewall-cmd --remove-service=ftp --zone=public 
+Success
+在public这个zone中添加允许访问3306端口的规则：
+[root@centos7 ~]# firewall-cmd --add-port=3306/tcp --zone=public 
+Success
+从public这个zone中删除允许访问3306端口的规则：
+[root@centos7 ~]# firewall-cmd --remove-port=3306/tcp --zone=public 
+Success
+将eno16777736网卡与public绑定，以后从该接口进入的流量，匹配public中的规则： 
+[root@centos7 ~]# firewall-cmd --add-interface=eno16777736 --zone=public
+Success
+将eno16777736网卡接口与public解除绑定：
+[root@centos7 ~]# firewall-cmd --remove-interface=eno33554984 --zone trusted
+将源IP地址1.1.1.1与public绑定，以后该主机访问本机时匹配public中的规则：
+[root@centos7 ~]# firewall-cmd --add-source=1.1.1.1 --zone=public 
+Success
+查看默认zone的规则列表：
+[root@centos7 ~]# firewall-cmd --list-all
+查看public这个zone的规则列表：
+[root@centos7 ~]# firewall-cmd --list-all --zone=public
+在public这个zone中添加一条永久规则（允许访问3306端口）,该规则再重启防火墙后依然有效：
+[root@centos7 ~]# firewall-cmd --permanent \
+> --add-port=3306/tcp --zone=public
+重新加载读取防火墙规则：
+[root@centos7 ~]# firewall-cmd --reload
