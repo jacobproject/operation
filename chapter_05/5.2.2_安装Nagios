@@ -1,0 +1,43 @@
+[root@nagios ~]# yum -y install gd gd-devel openssl openssl-devel \
+> httpd php gcc glibc glibc-common make net-snmp wget
+安装Nagios主程序时，源码包软件可以从sourceforge.net网站下载。安装前需要为nagios创建账户与组，这样在配置nagios软件时就可以使--with-nagios-user和--with-nagios-group指定以普通账号的身份运行该软件。最后需要通过多个make install安装部署不用的监控配置文件与目录：
+[root@nagios ~]# wget http://prdownloads.sourceforge.net\
+>/sourceforge/nagios/nagios-3.5.0.tar.gz
+[root@nagios ~]# groupadd nagios
+[root@nagios ~]# useradd -g nagios nagios
+[root@nagios ~]# tar -xzf nagios-3.5.0.tar.gz -C /usr/src/
+[root@nagios ~]# cd /usr/src/nagios/
+[root@nagios nagios]# ./configure --with-nagios-user=nagios\
+>--with-nagios-group=nagios
+[root@nagios nagios]# make all
+[root@nagios nagios]# make install		    #安装主程序，CGI以及HTML文件
+[root@nagios nagios]# make install-init    #安装启动脚本/etc/init.d/nagios
+[root@nagios nagios]# make install-commandmode #安装与配置目录权限
+[root@nagios nagios]# make install-config	#安装配置文件模板
+
+由于nagios最终将以Web的形式进行管理与监控，安装过程中使用make install-webconf命令将生成一个Web配置文件，install-webconf添加Apache附加配置文件/etc/httpd/conf.d/nagios.conf，该文件使得管理员可以通过访问Web管理与维护Nagios监控系统，安装Ngios插件：
+[root@nagios nagios]# make install-webconf
+
+Nagios的特色之一就是其拥有众多强大的插件，读者可以根据自己的实际需求有选择地安装部署这些插件，插件的具体功能介绍可以参考nagios官方网站，本书案例中将安装nagios-plugins和nrpe两个插件软件包。
+[root@nagios ~]# wget http://prdownloads.sourceforge.net/sourceforge\
+>/nagiosplug/nagios-plugins-1.4.16.tar.gz
+[root@nagios ~]# tar -xzf nagios-plugins-1.4.16.tar.gz -C /usr/src/
+[root@nagios ~]# cd /usr/src/nagios-plugins-1.4.16/
+[root@nagios nagios-plugins-1.4.16]# ./configure --prefix=/usr/local/nagios/
+[root@nagios nagios-plugins-1.4.16]# make
+[root@nagios nagios-plugins-1.4.16]# make install
+[root@nagios ~]# wget http://downloads.sourceforge.net\
+>/project/nagios/nrpe-2.x/nrpe-2.14/nrpe-2.14.tar.gz
+[root@nagios ~]# tar -xzf nrpe-2.14.tar.gz -C /usr/src/
+[root@nagios ~]# cd /usr/src/nrpe-2.14/
+[root@nagios ~]# ./configure
+[root@nagios ~]# make all
+[root@nagios ~]# make install-plugin
+[root@nagios ~]# make install-daemon
+[root@nagios ~]# make install-daemon-config
+[root@nagios ~]# chown -R nagios.nagios /usr/local/nagios
+[root@nagios ~]# setenforce 0
+[root@nagios ~]# sed –i 's/=enforcing/=permissive/' /etc/sysconfig/selinux
+
+安装Nagios时已经复制了一份nagios.conf文件到Apache配置文件/etc/httpd/conf.d/目录下，用于设定访问权限。下面根据实际需要创建账户信息文件，系统会提示输入账户密码。
+[root@nagios ~]# htpasswd -c /usr/local/nagios/etc/htpasswd.users tomcat
